@@ -1,0 +1,2 @@
+# CMS data-access layer (Req 12): sanityClient.ts (read-only public config),
+# queries.ts (GROQ + pure mappers), useCmsResource.ts (fetch hook). Later tasks.

@@ -1,0 +1,42 @@
+{
+  "name": "maija-portfolio",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "High-end, minimalistic, multi-page personal portfolio and CV website for Maija.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "studio:dev": "sanity dev --cwd studio",
+    "studio:build": "sanity build --cwd studio",
+    "studio:deploy": "sanity deploy --cwd studio"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.22.5",
+    "@sanity/vision": "^3.99.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "sanity": "^3.99.0",
+    "styled-components": "^6.5.3"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "fast-check": "^3.23.1",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.6"
+  }
+}

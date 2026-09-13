@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750" role="img" aria-label="Professional photo placeholder">
+  <rect width="600" height="750" fill="#FFF4EC" />
+  <rect x="12" y="12" width="576" height="726" fill="none" stroke="#141414" stroke-opacity="0.35" stroke-width="4" stroke-dasharray="14 12" />
+  <!-- simple portrait silhouette -->
+  <g fill="#141414" opacity="0.18">
+    <circle cx="300" cy="300" r="110" />
+    <path d="M120 700 C 120 520 480 520 480 700 Z" />
+  </g>
+  <text x="300" y="700" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#141414" opacity="0.5">Photo coming soon</text>
+</svg>

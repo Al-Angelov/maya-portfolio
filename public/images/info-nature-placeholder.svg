@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Nature-themed placeholder">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F5CBDA" />
+      <stop offset="100%" stop-color="#FFF4EC" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#sky)" />
+  <!-- rolling hills -->
+  <path d="M0 620 C 200 540 400 700 600 600 C 800 500 1000 680 1200 590 L1200 800 L0 800 Z" fill="#141414" opacity="0.12" />
+  <path d="M0 690 C 240 620 460 760 720 680 C 940 620 1080 730 1200 680 L1200 800 L0 800 Z" fill="#141414" opacity="0.18" />
+  <!-- trees -->
+  <g fill="#141414" opacity="0.22">
+    <polygon points="180,560 230,660 130,660" />
+    <polygon points="180,510 240,600 120,600" />
+    <rect x="172" y="655" width="16" height="40" />
+    <polygon points="980,600 1030,690 930,690" />
+    <polygon points="980,555 1040,640 920,640" />
+    <rect x="972" y="685" width="16" height="40" />
+  </g>
+  <!-- sun -->
+  <circle cx="600" cy="230" r="90" fill="#FFF4EC" opacity="0.7" />
+</svg>

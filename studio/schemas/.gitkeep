@@ -1,0 +1,2 @@
+# Sanity Studio authoring schemas (Req 12): timelineEntry, portfolioCard,
+# blogEntry, plus studio/sanity.config.ts. Deployed separately, never bundled.

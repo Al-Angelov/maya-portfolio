@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Font setup (Req 2.4, 2.5).
+ *
+ * "Bookman Old Style" is the first-choice font, with Georgia and the generic
+ * serif as fallbacks. The font-family stack itself is defined exactly once in
+ * `src/styles/theme.ts` and surfaced through Tailwind as the `serif` family
+ * (see tailwind.config.ts). We apply it to `body` via `@apply font-serif` so the
+ * font-family literal is not redeclared here (Req 2.6).
+ *
+ * The @font-face below registers optional locally-hosted "Bookman Old Style"
+ * faces (placed in `public/fonts/`) and prefers a locally-installed copy first
+ * via `local(...)`. If the font cannot be loaded or is unavailable, the browser
+ * falls back to Georgia (then serif) through the font-family stack (Req 2.5).
+ */
+@font-face {
+  font-family: "Bookman Old Style";
+  src:
+    local("Bookman Old Style"),
+    local("BookmanOldStyle"),
+    url("/fonts/BookmanOldStyle.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  body {
+    /* Inherit Bookman Old Style with Georgia/serif fallback on all text. */
+    @apply font-serif;
+  }
+
+  /* Smooth in-page scrolling for the Info hero CTA and other anchor jumps. */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /*
+   * Editorial display headline (Sointu Borg reference): an oversized, tightly
+   * tracked serif treatment for the hero name/title. Colors and font-family
+   * still come from the Design_System tokens (Req 2.6) — this utility only sets
+   * scale, weight, tracking, and line-height, not any color/font literal.
+   */
+  .display-name {
+    @apply font-serif font-normal leading-[0.95] tracking-tight;
+    font-size: clamp(3.25rem, 12vw, 9rem);
+  }
+
+  /* An uppercase, letter-spaced eyebrow/kicker used above or below the name. */
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.28em];
+  }
+
+  /*
+   * Classic editorial drop-cap for the opening sentence of a narrative column
+   * (Helsingin Sanomat long-form style). Enlarges and floats the first letter
+   * of the paragraph. Font-family/color still come from inherited tokens
+   * (Req 2.6) — this utility only sets scale/float/spacing.
+   */
+  .drop-cap::first-letter {
+    @apply font-serif;
+    float: left;
+    font-size: 3.5em;
+    line-height: 0.8;
+    padding-right: 0.08em;
+    padding-top: 0.05em;
+  }
+
+  /*
+   * Bold cinematic statement headline overlaid on the hero banner (HS feature
+   * style). Scales from text-5xl up to text-8xl at the md breakpoint.
+   */
+  .statement-headline {
+    @apply font-serif font-bold leading-[0.95] tracking-tight;
+  }
+
+  /*
+   * Full-bleed hero placeholder grid: subtle dark grid lines drawn with a
+   * repeating linear-gradient so the empty banner reads as an intentional
+   * placeholder rather than a broken image.
+   */
+  .hero-grid {
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255, 244, 236, 0.06) 0px,
+        rgba(255, 244, 236, 0.06) 1px,
+        transparent 1px,
+        transparent 48px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 244, 236, 0.06) 0px,
+        rgba(255, 244, 236, 0.06) 1px,
+        transparent 1px,
+        transparent 48px
+      );
+  }
+}
