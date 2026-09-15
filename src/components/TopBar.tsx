@@ -13,11 +13,17 @@
 // `aria-current="page"` to the link matching the current route; the `className`
 // function layers additional active styling on top.
 //
-// Responsive (Req 3.7): links stack in a single column at viewports ≤767px
-// (`flex-col`) and lay out in a row from the `md` breakpoint (768px) upward
-// (`md:flex-row`).
+// Responsive (Req 3.7): the header is a single flex container.
+//  - From the `md` breakpoint (768px) up it lays out in a row — brand, the five
+//    inline links, and the language toggle — and the hamburger is hidden.
+//  - Below `md` the top row stays slim (brand + hamburger only) and the SAME
+//    single nav + language toggle become a slide-down drawer that animates open
+//    and closed. There is exactly one nav landmark and one set of links in the
+//    DOM; only their layout and the collapse animation change with breakpoint,
+//    so nothing is duplicated.
 
-import { NavLink } from "react-router-dom";
+import { useEffect, useId, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
 import type { TranslationKey } from "../i18n/types";
 import { useI18n } from "../i18n/I18nProvider";
@@ -52,35 +58,93 @@ const inactiveLinkClasses =
 /**
  * The persistent top navigation bar. Reads the translation resolver from the
  * i18n context and renders the fixed set of navigation links plus the language
- * toggle; holds no state of its own.
+ * toggle; owns only the mobile drawer's open/closed state.
  */
 export function TopBar() {
   const { t } = useI18n();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const drawerId = useId();
+
+  // Collapse the mobile drawer whenever the route changes so tapping a link
+  // returns the bar to its slim resting state.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   return (
     <header className="sticky top-0 z-50 bg-sweetPink text-primaryDark">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-4 md:flex-row md:justify-between">
-        <nav aria-label="Primary">
-          <ul className="flex flex-col items-center gap-4 md:flex-row md:gap-8">
-            {NAV_ITEMS.map(({ path, labelKey }) => (
-              <li key={path}>
-                <NavLink
-                  to={path}
-                  end={path === "/"}
-                  className={({ isActive }) =>
-                    `${baseLinkClasses} ${
-                      isActive ? activeLinkClasses : inactiveLinkClasses
-                    }`
-                  }
-                >
-                  {t(labelKey)}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        {/* Right side: only the EN | FI language toggle (ultra-clean header). */}
-        <LanguageToggle />
+      {/* One flex container. On mobile it wraps to two rows (slim bar + drawer);
+          from md up it stays a single inline row. */}
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 px-6 py-4 md:flex-nowrap">
+        {/* Brand anchors the slim mobile bar and sits at the left on desktop. */}
+        <NavLink
+          to="/"
+          end
+          className="font-serif text-lg tracking-[0.2em] text-primaryDark no-underline"
+        >
+          MAIJA
+        </NavLink>
+
+        {/* Mobile (<md): hamburger toggle. Bars animate into a subtle "X". */}
+        <button
+          type="button"
+          aria-label={menuOpen ? t("nav.menu.close") : t("nav.menu.open")}
+          aria-expanded={menuOpen}
+          aria-controls={drawerId}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-full text-primaryDark transition-opacity hover:opacity-70 md:hidden"
+        >
+          <span
+            className={`block h-[1.5px] w-6 bg-primaryDark transition-transform duration-300 ${
+              menuOpen ? "translate-y-[6.5px] rotate-45" : ""
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-6 bg-primaryDark transition-opacity duration-300 ${
+              menuOpen ? "opacity-0" : "opacity-100"
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-6 bg-primaryDark transition-transform duration-300 ${
+              menuOpen ? "-translate-y-[6.5px] -rotate-45" : ""
+            }`}
+          />
+        </button>
+
+        {/* The one-and-only nav group. It is a full-width flex-basis item on
+            mobile (so it drops onto its own row below the slim bar) that
+            animates open/closed as a drawer; from md up it becomes an inline,
+            auto-width row alongside the brand with no height clamp. */}
+        <div
+          id={drawerId}
+          className={`w-full basis-full overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out md:w-auto md:basis-auto md:overflow-visible md:opacity-100 ${
+            menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 md:max-h-none"
+          }`}
+        >
+          <div className="flex flex-col items-center gap-6 pb-4 pt-4 md:flex-row md:gap-8 md:py-0">
+            <nav aria-label="Primary">
+              <ul className="flex flex-col items-center gap-5 md:flex-row md:gap-8">
+                {NAV_ITEMS.map(({ path, labelKey }) => (
+                  <li key={path}>
+                    <NavLink
+                      to={path}
+                      end={path === "/"}
+                      className={({ isActive }) =>
+                        `${baseLinkClasses} ${
+                          isActive ? activeLinkClasses : inactiveLinkClasses
+                        }`
+                      }
+                    >
+                      {t(labelKey)}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <LanguageToggle />
+          </div>
+        </div>
       </div>
     </header>
   );

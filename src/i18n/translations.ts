@@ -18,6 +18,8 @@ const EN = {
   "nav.portfolio": "Portfolio",
   "nav.blog": "On My Mind",
   "nav.contact": "Contact me",
+  "nav.menu.open": "Open menu",
+  "nav.menu.close": "Close menu",
 
   // --- Info page (Req 5) ---
   "info.name": "Maija",
@@ -106,6 +108,8 @@ const FI: Partial<Record<keyof typeof EN, string>> = {
   "nav.portfolio": "Portfolio",
   "nav.blog": "Ajatuksia",
   "nav.contact": "Ota yhteyttä",
+  "nav.menu.open": "Avaa valikko",
+  "nav.menu.close": "Sulje valikko",
 
   // --- Info page ---
   "info.role": "Esiintyjä · Kirjoittaja · Tarinankertoja",

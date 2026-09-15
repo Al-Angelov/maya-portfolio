@@ -61,8 +61,10 @@ describe("TopBar", () => {
     expect(within(header).queryByRole("link", { name: "Instagram" })).toBeNull();
     expect(within(header).queryByRole("link", { name: "Email" })).toBeNull();
 
-    // Every link in the header is one of the five nav links.
-    expect(within(header).getAllByRole("link")).toHaveLength(5);
+    // The header links are the brand ("MAIJA") plus the five nav links.
+    const headerLinks = within(header).getAllByRole("link");
+    expect(headerLinks).toHaveLength(6);
+    expect(within(header).getByRole("link", { name: "MAIJA" })).toBeTruthy();
 
     // The language toggle is still present.
     expect(within(header).getByRole("radio", { name: "EN" })).toBeTruthy();
@@ -98,6 +100,30 @@ describe("TopBar", () => {
 
     const infoLink = screen.getByRole("link", { name: "Info" });
     expect(infoLink.getAttribute("aria-current")).toBeNull();
+  });
+
+  it("exposes a mobile hamburger toggle that controls a collapsible menu (Req 3.7)", async () => {
+    const user = userEvent.setup();
+    renderTopBar();
+
+    // The toggle starts collapsed and is labeled for opening.
+    const toggle = screen.getByRole("button", { name: "Open menu" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+
+    // aria-controls points at the collapsible menu panel.
+    const controlledId = toggle.getAttribute("aria-controls");
+    expect(controlledId).toBeTruthy();
+
+    // Opening it flips aria-expanded and the accessible label.
+    await user.click(toggle);
+    const openToggle = screen.getByRole("button", { name: "Close menu" });
+    expect(openToggle.getAttribute("aria-expanded")).toBe("true");
+
+    // Closing it returns to the collapsed state.
+    await user.click(openToggle);
+    expect(
+      screen.getByRole("button", { name: "Open menu" }).getAttribute("aria-expanded"),
+    ).toBe("false");
   });
 
   it("updates navigation labels when the language changes to Finnish (Req 3.7)", async () => {
