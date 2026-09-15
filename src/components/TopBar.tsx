@@ -22,7 +22,7 @@
 //    DOM; only their layout and the collapse animation change with breakpoint,
 //    so nothing is duplicated.
 
-import { useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import type { TranslationKey } from "../i18n/types";
@@ -48,9 +48,11 @@ const NAV_ITEMS: readonly NavItem[] = [
 ] as const;
 
 // Clean editorial text links: no pill outline. Uppercase, letter-spaced labels
-// with a subtle underline + color emphasis marking the active route.
+// with a subtle underline + color emphasis marking the active route. Only the
+// cheap paint properties (color/opacity/text-decoration) transition — avoiding
+// `transition-all`, which would watch layout-affecting properties too.
 const baseLinkClasses =
-  "px-1 py-1 text-xs uppercase tracking-[0.18em] text-primaryDark transition-all duration-200 underline-offset-[6px] decoration-1";
+  "px-1 py-1 text-xs uppercase tracking-[0.18em] text-primaryDark transition-[color,opacity,text-decoration-color] duration-200 underline-offset-[6px] decoration-1";
 const activeLinkClasses = "font-semibold underline decoration-primaryDark";
 const inactiveLinkClasses =
   "font-normal no-underline opacity-60 hover:opacity-100 hover:underline";
@@ -72,11 +74,18 @@ export function TopBar() {
     setMenuOpen(false);
   }, [location.pathname]);
 
+  // Stable toggle handler. The only state this component owns is the drawer's
+  // open/closed boolean, so toggling it re-renders TopBar alone — it never
+  // touches the page layout or the InfoPage background layers.
+  const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
+
   return (
     <header className="sticky top-0 z-50 bg-sweetPink text-primaryDark">
-      {/* One flex container. On mobile it wraps to two rows (slim bar + drawer);
-          from md up it stays a single inline row. */}
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 px-6 py-4 md:flex-nowrap">
+      {/* One flex container, `relative` so the mobile drawer can anchor to its
+          bottom edge (top-full) as an out-of-flow overlay. On mobile the slim
+          bar is a single row (brand + hamburger); from md up it becomes the
+          full inline row. */}
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-x-4 px-6 py-4">
         {/* Brand anchors the slim mobile bar and sits at the left on desktop. */}
         <NavLink
           to="/"
@@ -92,7 +101,7 @@ export function TopBar() {
           aria-label={menuOpen ? t("nav.menu.close") : t("nav.menu.open")}
           aria-expanded={menuOpen}
           aria-controls={drawerId}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={toggleMenu}
           className="flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-full text-primaryDark transition-opacity hover:opacity-70 md:hidden"
         >
           <span
@@ -112,17 +121,25 @@ export function TopBar() {
           />
         </button>
 
-        {/* The one-and-only nav group. It is a full-width flex-basis item on
-            mobile (so it drops onto its own row below the slim bar) that
-            animates open/closed as a drawer; from md up it becomes an inline,
-            auto-width row alongside the brand with no height clamp. */}
+        {/* The one-and-only nav group.
+            Mobile: an absolutely-positioned drawer BELOW the slim bar. Being
+            out of the flex flow means opening it never reflows the header or
+            the page beneath — the reveal is a pure GPU-composited animation of
+            `transform` (translate-y) + `opacity`, with visibility toggled so
+            the collapsed drawer isn't focusable. No `max-height`/`display`
+            animation, so no per-frame layout.
+            Desktop (md+): reverts to a static inline row alongside the brand —
+            transform/visibility/positioning are all reset so it behaves exactly
+            like a normal flex item. */}
         <div
           id={drawerId}
-          className={`w-full basis-full overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out md:w-auto md:basis-auto md:overflow-visible md:opacity-100 ${
-            menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 md:max-h-none"
-          }`}
+          className={`absolute inset-x-0 top-full origin-top transform-gpu bg-sweetPink transition-[transform,opacity] duration-200 ease-out will-change-[transform,opacity] md:static md:transform-none md:bg-transparent md:opacity-100 md:transition-none md:will-change-auto ${
+            menuOpen
+              ? "translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-2 opacity-0 md:pointer-events-auto md:translate-y-0"
+          } ${menuOpen ? "visible" : "invisible md:visible"}`}
         >
-          <div className="flex flex-col items-center gap-6 pb-4 pt-4 md:flex-row md:gap-8 md:py-0">
+          <div className="flex flex-col items-center gap-6 pb-6 pt-2 md:flex-row md:gap-8 md:py-0">
             <nav aria-label="Primary">
               <ul className="flex flex-col items-center gap-5 md:flex-row md:gap-8">
                 {NAV_ITEMS.map(({ path, labelKey }) => (
