@@ -14,8 +14,13 @@
 //   introduction narrative with a classic drop-cap (Req 5.3, 5.4), and a single
 //   "Contact Me" button with the LinkedIn icon inline beside it.
 // - On mobile the portrait becomes a banner above the content.
-// - There is NO nature-scenery background here (removed); the page integrates
-//   cleanly with the black global footer below via the AppShell.
+// - Atmospheric top layer: a decorative nature background (info-bg.jpg) is
+//   painted only across the TOP portion of the page — from behind the nav down
+//   to behind roughly the top third of the portrait. It is heavily dimmed by a
+//   dark scrim and fades out via a gradient mask so it dissolves completely into
+//   the solid Primary_Dark before the middle of the page. The content sits above
+//   it (z-10), so the portrait reads as layered over the fade and the right-hand
+//   text column always rests on a pure, readable dark background.
 //
 // There is intentionally exactly ONE portrait frame and ONE bio narrative.
 
@@ -26,6 +31,20 @@ import { LINKEDIN_URL } from "../config/site";
 
 /** Static portrait image (served from public/images at the site root). */
 const HERO_IMAGE = "/images/info-hero.jpg";
+
+/**
+ * Decorative nature background painted across the top of the page. Served from
+ * public/images at the site root.
+ */
+const TOP_NATURE_IMAGE = "/images/info-bg.jpg";
+
+/**
+ * Gradient used both as the layer's opacity mask (via mask-image) and mirrored
+ * on the scrim. The image is fully present at the very top and fades to nothing
+ * before ~45% down the layer, so it never reaches the middle of the page.
+ */
+const TOP_FADE_MASK =
+  "linear-gradient(to bottom, black 0%, black 18%, rgba(0,0,0,0.55) 34%, transparent 46%)";
 
 /** Configuration for the Info_Page's external professional profile link. */
 export interface InfoConfig {
@@ -103,9 +122,34 @@ export default function InfoPage() {
   return (
     <section
       aria-labelledby="info-heading"
-      className="bg-primaryDark text-warmIvory"
+      className="relative overflow-hidden bg-primaryDark text-warmIvory"
     >
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 px-6 py-12 md:grid-cols-2 md:gap-16 md:py-20 lg:gap-20">
+      {/* -------------------------------------------------------------
+          Atmospheric top nature layer (decorative, not an <img>). Spans the
+          full width from behind the nav down across the top ~55% of the hero.
+          Its own gradient mask fades the whole layer out before the middle so
+          it dissolves seamlessly into the solid Primary_Dark below; a heavy
+          dark scrim keeps the imagery dim and non-distracting. Sits at the base
+          of the stacking context (below the z-10 content grid).
+          ------------------------------------------------------------- */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[55%] bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${TOP_NATURE_IMAGE})`,
+          maskImage: TOP_FADE_MASK,
+          WebkitMaskImage: TOP_FADE_MASK,
+        }}
+      >
+        {/* Dark scrim over the nature image, itself masked with the same fade
+            so the dimmed imagery and the overlay disappear together. */}
+        <div
+          className="absolute inset-0 bg-black/70"
+          style={{ maskImage: TOP_FADE_MASK, WebkitMaskImage: TOP_FADE_MASK }}
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 px-6 py-12 md:grid-cols-2 md:gap-16 md:py-20 lg:gap-20">
         {/* -------------------------------------------------------------
             LEFT: the sticky, curated portrait. On desktop it locks in view
             (`sticky top-8`) with a bounded height so it stays fully visible as
